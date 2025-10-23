@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\BlogController;
+use App\Http\Controllers\GalleryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\Admin\TourPackageController;
@@ -37,6 +38,9 @@ Route::put('/company-contact/{id}', [CompanyContactController::class, 'update'])
 //blog frontend visible parts
 Route::get('/admin-blogs', [BlogController::class, 'index']);
 Route::get('/admin-blogs/{id}', [BlogController::class,'show']);
+
+//gallery image visible
+Route::get('/gallery', [GalleryController::class, 'index']);
 
 
 
@@ -88,6 +92,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //to update admin profile
     Route::patch('/admin-profile', [AdminController::class, 'updateProfile']);
+
+    //CRUD gallery images
+    Route::get('/admin-gallery', [GalleryController::class, 'index']);
+    Route::post('/gallery', [GalleryController::class, 'store']);
+    Route::put('/gallery/{id}', [GalleryController::class, 'update']);
+    Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
 
 
 });
