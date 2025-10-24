@@ -96,6 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //CRUD gallery images
     Route::get('/admin-gallery', [GalleryController::class, 'index']);
     Route::post('/gallery', [GalleryController::class, 'store']);
+    Route::get('/gallery/{id}', [GalleryController::class, 'show']);
     Route::put('/gallery/{id}', [GalleryController::class, 'update']);
     Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
 

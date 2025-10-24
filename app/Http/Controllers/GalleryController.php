@@ -40,6 +40,14 @@ class GalleryController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $gallery = Gallery::findOrFail($id);
+
+        return response()->json($gallery);
+    }
+
+
     //Update A Gallery Image
     public function update(Request $request, $id)
     {
@@ -57,8 +65,8 @@ class GalleryController extends Controller
 
         //if a new image is uploaded, delete old and store new
         if($request->hasFile('image')){
-            if ($gallery->image_path && storage::disk('public')->exists($gallery->image_path)){
-                storage::disk('public')->delete($gallery->image_path);
+            if ($gallery->image_path && Storage::disk('public')->exists($gallery->image_path)){
+                Storage::disk('public')->delete($gallery->image_path);
             }
             $gallery->image_path=$request->file('image')->store('gallery', 'public');
 
