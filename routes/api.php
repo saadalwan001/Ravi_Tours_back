@@ -11,45 +11,43 @@ use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\Admin\AttractionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Admin\CompanyContactController;
+use App\Http\Controllers\ContactInquiryController;
 
-
-
-
-//Public route adding point before Sanctum auth
+// Public routes - accessible without authentication
 Route::get('/tour-packages', [TourPackageController::class, 'allPublic']);
-Route::get('/packages/{id}', [TourPackageController::class, 'showPublic']); // to fetch pack detials in new page
+Route::get('/packages/{id}', [TourPackageController::class, 'showPublic']);
 Route::post('/send-enquiry', [EnquiryController::class, 'send']);
 
-
-//public routes for attraction and destinations
+// Public routes for attraction and destinations
 Route::get('/attractions',[AttractionController::class, 'index']);
 Route::get('/attractions/latest',[AttractionController::class, 'latest']);
 Route::get('/attractions/{id}', [AttractionController::class, 'show']);
 Route::get('/attractions/{id}/tour-packages', [AttractionController::class, 'tourPackages']);
 
-//public routes for comments
+// Public routes for comments
 Route::post('/comments', [CommentController::class, 'store']);
 Route::get('/comments/{blogId}',[CommentController::class,'index']);
 
-//public routes for company contact
+// Public routes for company contact
 Route::get('/company-contact', [CompanyContactController::class, 'index']);
 Route::put('/company-contact/{id}', [CompanyContactController::class, 'update']);
 
-//blog frontend visible parts
+// Blog frontend visible parts
 Route::get('/admin-blogs', [BlogController::class, 'index']);
 Route::get('/admin-blogs/{id}', [BlogController::class,'show']);
 
-//gallery image visible
+// Gallery image visible
 Route::get('/gallery', [GalleryController::class, 'index']);
 
+// Contact inquiry route - MOVED OUTSIDE AUTH MIDDLEWARE
+Route::post('/contact-inquiry', [ContactInquiryController::class, 'store']);
 
-
-
+// Admin authentication
 Route::post('/admin-login', [AdminAuthController::class, 'login']);
 Route::post('/admin-logout', [AdminAuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// Protected routes - require authentication
 Route::middleware('auth:sanctum')->group(function () {
-
     Route::get('/admin-dashboard', function () {
         return response()->json(['message' => 'Welcome Admin', 'admin' => auth()->user()]);
     });
@@ -63,42 +61,33 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/admin-packages/{id}/toggle', [TourPackageController::class, 'toggle']);
     Route::get('/admin-packages/all',[TourPackageController::class,'allPackages']);
 
-
-
     // Itineraries
     Route::get('/admin-packages/{package}/itineraries', [ItineraryController::class, 'index']);
     Route::post('/admin-packages/{package}/itineraries', [ItineraryController::class, 'store']);
     Route::patch('/admin-itineraries/{itinerary}', [ItineraryController::class, 'update']);
     Route::delete('/admin-itineraries/{itinerary}', [ItineraryController::class, 'destroy']);
 
-    //Attraction & Experience related Images and other data routes
+    // Attraction & Experience related Images and other data routes
     Route::get('/admin-attractions', [AttractionController::class, 'index']);
     Route::get('/admin-attractions/{id}', [AttractionController::class, 'show']);
     Route::post('/admin-attractions', [AttractionController::class, 'store']);
     Route::patch('/admin-attractions/{id}', [AttractionController::class, 'update']);
     Route::delete('/admin-attractions/{id}', [AttractionController::class, 'destroy']);
 
-    //to  blog insertion, update and delete
+    // Blog insertion, update and delete
     Route::post('/admin-blogs',[BlogController::class, 'store']);
     Route::patch('/admin-blogs/{id}',[BlogController::class, 'update']);
     Route::delete('/admin-blogs/{id}', [BlogController::class,'destroy']);
 
-    //to provide admin name and id as dropdown
+    // Admin management
     Route::get('/admins', [AdminController::class, 'index']);
-
-    // fetch admin details to profile page
     Route::get('/admin-profile', [AdminController::class, 'getProfile']);
-
-
-    //to update admin profile
     Route::patch('/admin-profile', [AdminController::class, 'updateProfile']);
 
-    //CRUD gallery images
+    // Gallery management
     Route::get('/admin-gallery', [GalleryController::class, 'index']);
     Route::post('/gallery', [GalleryController::class, 'store']);
     Route::get('/gallery/{id}', [GalleryController::class, 'show']);
     Route::put('/gallery/{id}', [GalleryController::class, 'update']);
     Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
-
-
 });
