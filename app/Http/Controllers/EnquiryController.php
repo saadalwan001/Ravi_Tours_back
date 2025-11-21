@@ -4,28 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\EnquiryMail;
+use App\Mail\TourEnquiry;
 
 class EnquiryController extends Controller
 {
-    public function send(Request $request){
-        $request ->validate([
+    public function send(Request $request)
+    {
+        // Validate incoming data
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'country' => 'required|string|max:255',
-            'contactNumber' => 'required|string|max:255',
-            'adults' => 'required|string|max:255',
-            'children' => 'required|string|max:255',
-            'subject' => 'required|string|max:255',
-            'message' => 'required|string|max:255',
-
+            'contactNumber' => 'required|string|max:20',
+            'adults' => 'required|integer|min:1',
+            'children' => 'nullable|integer|min:0',
+            'subject' => 'nullable|string|max:500',
+            'message' => 'nullable|string|max:2000',
+            'tripName' => 'required|string|max:255',
         ]);
 
-        $data = $request->all();
+        try {
+            // Send email
+            Mail::to(env('CONTACT_EMAIL', 'info@embarkceylon.com'))
+                ->send(new TourEnquiry($validated));
 
-        //below is the place where we used to specify the mail address to which the mail has to be sent
-        Mail::to('saadalwan765@gmail.com')->send(new EnquiryMail($data));
-
-        return response()->json(['message' => 'Enquiry sent successfully!']);
-}
+            return response()->json([
+                'success' => true,
+                'message' => 'Tour enquiry sent successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send enquiry: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

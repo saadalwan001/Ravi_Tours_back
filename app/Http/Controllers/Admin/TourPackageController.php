@@ -32,7 +32,7 @@ class TourPackageController extends Controller
     public function store(Request $request)
     {
         // Decode JSON arrays if sent as strings
-        foreach (['itineraries', 'included_items', 'excluded_items', 'attractions'] as $field) {
+        foreach (['itineraries', 'included_items', 'excluded_items', 'attractions', 'adult_group_pricing', 'child_group_pricing'] as $field) {
             if ($request->has($field) && is_string($request->$field)) {
                 $request->merge([$field => json_decode($request->$field, true)]);
             }
@@ -53,6 +53,10 @@ class TourPackageController extends Controller
                 'sub_image2'    => 'nullable|image|mimes:jpg,png,jpeg,webp|max:5120',
                 'sub_image3'    => 'nullable|image|mimes:jpg,png,jpeg,webp|max:5120',
                 'sub_image4'    => 'nullable|image|mimes:jpg,png,jpeg,webp|max:5120',
+                'adult_single_price' => 'nullable|numeric|min:0',
+                'child_single_price' => 'nullable|numeric|min:0',
+                'adult_group_pricing' => 'nullable|array',
+                'child_group_pricing' => 'nullable|array',
                 'itineraries'   => 'sometimes|array',
                 'itineraries.*.day_title' => 'required_with:itineraries|string|max:255',
                 'itineraries.*.description' => 'required_with:itineraries|string',
@@ -73,6 +77,12 @@ class TourPackageController extends Controller
 
             $data['included_items'] = $validated['included_items'] ?? [];
             $data['excluded_items'] = $validated['excluded_items'] ?? [];
+            
+            // Handle pricing data
+            $data['adult_single_price'] = $validated['adult_single_price'] ?? null;
+            $data['child_single_price'] = $validated['child_single_price'] ?? null;
+            $data['adult_group_pricing'] = $validated['adult_group_pricing'] ?? null;
+            $data['child_group_pricing'] = $validated['child_group_pricing'] ?? null;
 
             $package = TourPackage::create($data);
 
@@ -117,7 +127,7 @@ class TourPackageController extends Controller
         $package = TourPackage::findOrFail($id);
 
         // Decode JSON arrays if sent as strings
-        foreach (['itineraries', 'included_items', 'excluded_items', 'attractions'] as $field) {
+        foreach (['itineraries', 'included_items', 'excluded_items', 'attractions', 'adult_group_pricing', 'child_group_pricing'] as $field) {
             if ($request->has($field) && is_string($request->$field)) {
                 $request->merge([$field => json_decode($request->$field, true)]);
             }
@@ -130,6 +140,10 @@ class TourPackageController extends Controller
             'enabled'      => 'sometimes|boolean',
             'included_items' => 'nullable|array',
             'excluded_items' => 'nullable|array',
+            'adult_single_price' => 'nullable|numeric|min:0',
+            'child_single_price' => 'nullable|numeric|min:0',
+            'adult_group_pricing' => 'nullable|array',
+            'child_group_pricing' => 'nullable|array',
             'main_image'   => 'nullable|image|mimes:jpg,png,jpeg,webp|max:5120',
             'sub_image1'   => 'nullable|image|mimes:jpg,png,jpeg,webp|max:5120',
             'sub_image2'   => 'nullable|image|mimes:jpg,png,jpeg,webp|max:5120',
@@ -154,6 +168,20 @@ class TourPackageController extends Controller
 
             $data['included_items'] = $validated['included_items'] ?? $package->included_items ?? [];
             $data['excluded_items'] = $validated['excluded_items'] ?? $package->excluded_items ?? [];
+            
+            // Handle pricing updates
+            if (isset($validated['adult_single_price'])) {
+                $data['adult_single_price'] = $validated['adult_single_price'];
+            }
+            if (isset($validated['child_single_price'])) {
+                $data['child_single_price'] = $validated['child_single_price'];
+            }
+            if (isset($validated['adult_group_pricing'])) {
+                $data['adult_group_pricing'] = $validated['adult_group_pricing'];
+            }
+            if (isset($validated['child_group_pricing'])) {
+                $data['child_group_pricing'] = $validated['child_group_pricing'];
+            }
 
             $package->update($data);
 

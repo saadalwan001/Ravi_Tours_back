@@ -21,7 +21,10 @@ class TourPackage extends Model
         'enabled',
         'included_items',
         'excluded_items',
-
+        'adult_single_price',
+        'child_single_price',
+        'adult_group_pricing',
+        'child_group_pricing',
     ];
 
     protected $casts=[
@@ -29,6 +32,10 @@ class TourPackage extends Model
         'total_days' => 'integer',
         'included_items' => 'array',
         'excluded_items' => 'array',
+        'adult_single_price' => 'decimal:2',
+        'child_single_price' => 'decimal:2',
+        'adult_group_pricing' => 'array',
+        'child_group_pricing' => 'array',
     ];
 
     public function itineraries(){
@@ -40,5 +47,3 @@ class TourPackage extends Model
         return $this->belongsToMany(Attraction::class, 'attraction_tour_package');
     }
 }
-
-
